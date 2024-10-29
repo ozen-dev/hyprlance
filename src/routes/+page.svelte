@@ -15,7 +15,7 @@
     async function handleConnect(platform: string) {
         const webview = new WebviewWindow("auth", {
             url: `/connect/${platform}`,
-            title: `Connect ${platform}`,
+            title: `${platform.toUpperCase()}`,
             width: 400,
             height: 600,
             resizable: false,

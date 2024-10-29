@@ -1,6 +1,6 @@
 {
     "$schema": "https://schema.tauri.app/config/2",
-    "productName": "hyprlance",
+    "productName": "Hyprlance",
     "version": "0.1.0",
     "identifier": "com.hyprlance.app",
     "build": {
@@ -12,9 +12,9 @@
     "app": {
         "windows": [
             {
-                "title": "hyprlance",
-                "width": 800,
-                "height": 600
+                "title": "Hyprlance",
+                "width": 900,
+                "height": 700
             }
         ],
         "security": {

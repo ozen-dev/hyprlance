@@ -8,10 +8,18 @@
     onMount(async () => {
         const window = getCurrentWindow();
         const platform = $page.params.platform;
-        const token = await invoke("get_platform_session", {
-            platform,
-        });
-        await window.emit("connection-callback", { token });
+        let token = "";
+
+        try {
+            token = await invoke("get_platform_session", {
+                platform,
+            });
+            await window.emit("connection-callback", { token });
+        } catch (error) {
+            console.error(error);
+            await window.emit("connection-callback", { token, error });
+        }
+
         window.close();
     });
 </script>

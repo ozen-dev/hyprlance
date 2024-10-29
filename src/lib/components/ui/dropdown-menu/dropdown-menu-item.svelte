@@ -18,7 +18,6 @@
 		inset && "pl-8",
 		className
 	)}
-	{...$$restProps}
 	on:click
 	on:keydown
 	on:focusin
@@ -26,6 +25,7 @@
 	on:pointerdown
 	on:pointerleave
 	on:pointermove
+	{...$$restProps}
 >
 	<slot />
 </DropdownMenuPrimitive.Item>

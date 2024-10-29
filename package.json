@@ -29,6 +29,7 @@
     "mode-watcher": "^0.4.1",
     "svelte": "^5.0.0",
     "svelte-check": "^4.0.0",
+    "svelte-radix": "^2.0.1",
     "svelte-sonner": "^0.3.28",
     "tailwind-merge": "^2.5.4",
     "tailwind-variants": "^0.2.1",

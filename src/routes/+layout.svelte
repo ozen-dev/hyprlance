@@ -1,1 +1,7 @@
-<script>import "../app.css";</script><slot></slot>
+<script>
+    import "../app.css";
+    import { Toaster } from "$lib/components/ui/sonner";
+</script>
+
+<slot></slot>
+<Toaster />

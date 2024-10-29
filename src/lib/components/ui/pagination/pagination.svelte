@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { Pagination as PaginationPrimitive } from "bits-ui";
-
 	import { cn } from "$lib/components/utils.js";
 
 	type $$Props = PaginationPrimitive.Props;
@@ -11,6 +10,7 @@
 	export let perPage: $$Props["perPage"] = 10;
 	export let page: $$Props["page"] = 1;
 	export let siblingCount: $$Props["siblingCount"] = 1;
+
 	export { className as class };
 
 	$: currentPage = page;

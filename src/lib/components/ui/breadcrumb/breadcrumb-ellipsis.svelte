@@ -1,6 +1,6 @@
 <script lang="ts">
-	import Ellipsis from "lucide-svelte/icons/ellipsis";
 	import type { HTMLAttributes } from "svelte/elements";
+	import DotsHorizontal from "svelte-radix/DotsHorizontal.svelte";
 	import { cn } from "$lib/components/utils.js";
 
 	type $$Props = HTMLAttributes<HTMLSpanElement> & {
@@ -19,6 +19,6 @@
 	class={cn("flex h-9 w-9 items-center justify-center", className)}
 	{...$$restProps}
 >
-	<Ellipsis class="h-4 w-4" />
+	<DotsHorizontal class="h-4 w-4 outline-none" tabindex="-1" />
 	<span class="sr-only">More</span>
 </span>

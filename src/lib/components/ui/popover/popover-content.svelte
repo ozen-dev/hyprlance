@@ -1,26 +1,27 @@
 <script lang="ts">
-	import { DropdownMenu as DropdownMenuPrimitive } from "bits-ui";
+	import { Popover as PopoverPrimitive } from "bits-ui";
 	import { cn, flyAndScale } from "$lib/components/utils.js";
 
-	type $$Props = DropdownMenuPrimitive.ContentProps;
+	type $$Props = PopoverPrimitive.ContentProps;
 
 	let className: $$Props["class"] = undefined;
-	export let sideOffset: $$Props["sideOffset"] = 4;
 	export let transition: $$Props["transition"] = flyAndScale;
 	export let transitionConfig: $$Props["transitionConfig"] = undefined;
+	export let align: $$Props["align"] = "center";
+	export let sideOffset: $$Props["sideOffset"] = 4;
 	export { className as class };
 </script>
 
-<DropdownMenuPrimitive.Content
+<PopoverPrimitive.Content
 	{transition}
 	{transitionConfig}
+	{align}
 	{sideOffset}
+	{...$$restProps}
 	class={cn(
-		"bg-popover text-popover-foreground z-50 min-w-[8rem] rounded-md border p-1 shadow-md focus:outline-none",
+		"bg-popover text-popover-foreground z-50 w-72 rounded-md border p-4 shadow-md outline-none",
 		className
 	)}
-	{...$$restProps}
-	on:keydown
 >
 	<slot />
-</DropdownMenuPrimitive.Content>
+</PopoverPrimitive.Content>

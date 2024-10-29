@@ -56,7 +56,6 @@
 
             toast.success(`Connection established!`);
         } catch (err) {
-            console.log("caught: ", err);
             toast.error(String(err));
         }
 

@@ -1,7 +1,7 @@
-# Tauri + SvelteKit + TypeScript
+![hyprlance-banner](https://github.com/user-attachments/assets/090cf06e-f692-40b8-a260-b10ec0ef5b8e)
 
-This template should help get you started developing with Tauri, SvelteKit and TypeScript in Vite.
+Hyprlance is a free and open source application that helps freelancers centralize inquiries, projects, reviews and earnings from multiple freelance platforms such as Fiverr, Upwork or Contra.
 
-## Recommended IDE Setup
+More coming soon :)
 
-[VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer).
+https://hyprlance.framer.website/

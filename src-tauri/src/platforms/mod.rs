@@ -1,9 +1,11 @@
+use std::sync::Arc;
+
 use serde::Serialize;
+use tauri::AppHandle;
 
 pub mod contra;
-pub mod fiverr;
+pub mod proxy;
 
-/// Represents authentication data for a platform
 #[derive(Serialize)]
 pub struct AuthData {
     pub uid: String,
@@ -11,19 +13,23 @@ pub struct AuthData {
     pub token: String,
 }
 
-/// Service for handling platform authentication
 pub struct AuthService;
 
 impl AuthService {
-    /// Authenticates with the specified platform
-    pub async fn authenticate(
-        platform: &str,
-        webview: tauri::WebviewWindow,
-    ) -> Result<AuthData, String> {
-        match platform {
-            "contra" => contra::authenticate(webview).await,
-            "fiverr" => fiverr::authenticate(webview).await,
+    pub async fn authenticate(app: AppHandle, platform: &str) -> Result<AuthData, String> {
+        let proxy_server = proxy::create_proxy_server(app.clone())
+            .await
+            .map_err(|e| format!("Failed to create proxy server: {}", e))?;
+
+        let result = match platform {
+            "contra" => contra::authenticate(app, Arc::clone(&proxy_server)).await,
             _ => Err(format!("Platform '{}' is not supported.", platform)),
+        };
+
+        if let Err(e) = proxy_server.shutdown() {
+            eprintln!("Failed to shutdown proxy server: {}", e);
         }
+
+        result
     }
 }

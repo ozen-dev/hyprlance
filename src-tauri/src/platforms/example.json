@@ -1,0 +1,59 @@
+{
+    "contra": {
+        "data": {
+            "visitor": {
+                "id": "fake_123",
+                "sessionId": "fake_123",
+                "impersonator": null,
+                "ipAddress": {},
+                "traits": {},
+                "featureFlags": {},
+                "userAccount": {
+                    "calendarLink": "https://calendar.com/fake",
+                    "createdAt": "2024-10-17T14:08:49.833Z",
+                    "posthogId": "fake_123",
+                    "analyticsUserId": "fake_123",
+                    "isTestAccount": false,
+                    "selectedUserType": "CONTRACTOR",
+                    "signupSource": "google",
+                    "id": "123",
+                    "emailAddress": "fake_123@email.com",
+                    "intercomUserHash": "fake_123",
+                    "userFeatures": [],
+                    "userInterfaceFlags": [],
+                    "userGroups": [],
+                    "waitLists": {},
+                    "workspaceForSelectedUserType": {},
+                    "workspaces": [],
+                    "profile": {
+                        "title": "Title",
+                        "bio": "Hi, this is a bio",
+                        "displayUsername": "enzo_romera",
+                        "onboardingType": "CONTRACTOR",
+                        "professionalTitle": null,
+                        "id": "fake_123",
+                        "firstName": "Enzo",
+                        "lastName": "Romera",
+                        "analyticsId": 123,
+                        "independentPortfolioTemplateTheme": null,
+                        "analytics": {
+                            "id": "fake_123"
+                        },
+                        "location": "City, Country",
+                        "organizationV2": null,
+                        "locationGooglePlaceId": "fake_123",
+                        "hasActivePortfolioSubscription": true,
+                        "avatarImage": {
+                            "id": "fake_123",
+                            "uid": "fake_123",
+                            "url": "https://media.contra.com/image/upload"
+                        },
+                        "isRemovedFromClientWorkspace": false,
+                        "membershipRequestedAt": null
+                    }
+                }
+            }
+        }
+    },
+    "fiverr": {}
+}

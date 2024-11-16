@@ -1,28 +1,85 @@
-use crate::platforms::proxy::HttpRequest;
-
-use super::proxy::ProxyServer;
 use super::AuthData;
-
-use serde_json::Value;
-use std::sync::Arc;
-use std::sync::Mutex;
 use std::time::Duration;
 use tauri::{AppHandle, Listener, WebviewUrl, WebviewWindowBuilder};
-use tokio::sync::oneshot;
-use tokio::time::sleep;
+use tokio::{sync::mpsc, time::timeout};
 
-pub async fn authenticate(
-    app: AppHandle,
-    proxy_server: Arc<ProxyServer>,
-) -> Result<AuthData, String> {
+const EMITTER: &str = r#"
+    (function() {
+        const originalFetch = window.fetch;
+        window.fetch = async (...args) => {
+            try {
+                const response = await originalFetch(...args);
+                const [url, options] = args;
+                if (url === "https://contra.com/api/") {
+                    const clonedResponse = response.clone();
+                    const responseBody = await clonedResponse.text();
+                    const { data: { visitor } } = JSON.parse(responseBody);
+
+                    if (visitor &&
+                        visitor.userAccount &&
+                        visitor.userAccount.id &&
+                        visitor.userAccount.emailAddress &&
+                        visitor.sessionId) {
+                        const authData = {
+                            uid: visitor.userAccount.id,
+                            email: visitor.userAccount.emailAddress,
+                            token: visitor.sessionId,
+                        };
+                        console.log("🟢 Found auth data => ", authData)
+                        window.__TAURI_INTERNALS__.invoke("emit_api_data", { payload: JSON.stringify(authData) });
+                    }
+                }
+                return response;
+            } catch (error) {
+                console.error("Fetch error:", error);
+                return response;
+            }
+        };
+    })();
+"#;
+
+pub async fn authenticate(app: AppHandle) -> Result<AuthData, String> {
     println!("🔐 Authenticating with contra.com...");
 
-    let app_clone = app.clone();
-    let (tx, rx) = oneshot::channel();
-    let tx = Arc::new(Mutex::new(Some(tx)));
-    let tx_clone = tx.clone();
-    let event_id = Arc::new(Mutex::new(None));
-    let event_id_clone = event_id.clone();
+    let (tx, mut rx) = mpsc::channel(1);
+
+    let listener = app.listen("hyprlance:contra-data", {
+        let sender = tx.clone();
+        move |event| {
+            let sender = sender.clone();
+            tauri::async_runtime::spawn(async move {
+                match serde_json::from_str::<String>(&event.payload()) {
+                    Ok(json_str) => {
+                        match serde_json::from_str::<serde_json::Value>(&json_str) {
+                            Ok(json_value) => {
+                                if let (Some(uid), Some(email), Some(token)) = (
+                                    json_value.get("uid").and_then(|v| v.as_str()),
+                                    json_value.get("email").and_then(|v| v.as_str()),
+                                    json_value.get("token").and_then(|v| v.as_str()),
+                                ) {
+                                    let auth_data = AuthData {
+                                        uid: uid.to_string(),
+                                        email: email.to_string(),
+                                        token: token.to_string(),
+                                    };
+                                    println!("🟢 Successfully extracted auth data");
+                                    let _ = sender.send(auth_data).await;
+                                } else {
+                                    eprintln!("🔴 Failed to extract required fields from inner JSON: {:?}", json_value);
+                                }
+                            }
+                            Err(e) => {
+                                eprintln!("🔴 Failed to parse inner JSON: {}", e);
+                            }
+                        }
+                    }
+                    Err(e) => {
+                        eprintln!("🔴 Failed to parse outer JSON string: {}", e);
+                    }
+                }
+            });
+        }
+    });
 
     let auth_window = WebviewWindowBuilder::new(
         &app,
@@ -33,49 +90,21 @@ pub async fn authenticate(
     .center()
     .inner_size(400.0, 600.0)
     .resizable(true)
-    .proxy_url(proxy_server.get_proxy_url()?)
+    .initialization_script(EMITTER)
     .build()
     .map_err(|e| {
         eprintln!("🔐 Failed to create window: {}", e);
         e.to_string()
     })?;
-    let auth_window_clone = auth_window.clone();
 
-    *event_id.lock().unwrap() = Some(app.listen("new-proxy-request", move |event| {
-        let payload = event.payload();
-        if let Ok(json_value) = serde_json::from_str::<Value>(payload) {
-            if let Ok(http_request) = serde_json::from_value::<HttpRequest>(json_value) {
-                println!("\n------------------------\n");
-                HttpRequest::print(&http_request);
-                println!("\n------------------------\n");
+    let auth_data = timeout(Duration::from_secs(180), rx.recv())
+        .await
+        .map_err(|_| "Authentication timed out after 3 minutes".to_string())?
+        .ok_or_else(|| "Failed to receive authentication data".to_string())?;
 
-                // let auth_data = AuthData {
-                //     uid: String::from(""),
-                //     email: String::from(""),
-                //     token: String::from("c_event_token"),
-                // };
+    app.unlisten(listener);
+    auth_window.close().map_err(|e| e.to_string())?;
 
-                // if let Some(id) = event_id_clone.lock().unwrap().take() {
-                //     app_clone.unlisten(id);
-                // }
-                // auth_window_clone.close().unwrap();
-                // if let Some(tx) = tx_clone.lock().unwrap().take() {
-                //     let _ = tx.send(auth_data);
-                // }
-            }
-        }
-    }));
-
-    tokio::select! {
-        auth_data = rx => {
-            auth_data.map_err(|e| e.to_string())
-        }
-        _ = sleep(Duration::from_secs(180)) => {
-            if let Some(id) = event_id.lock().unwrap().take() {
-                app.unlisten(id);
-            }
-            auth_window.close().unwrap();
-            Err(String::from("Error authenticating with Contra: timeout"))
-        }
-    }
+    println!("🔐 Successfully authenticated with Contra");
+    Ok(auth_data)
 }

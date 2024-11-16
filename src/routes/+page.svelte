@@ -75,7 +75,7 @@
         connection with different freelance platforms.
     </h1>
 
-    <content class="mx-auto px-4 w-full max-w-[700px]">
+    <content class="mx-auto px-4 w-full">
         <section class="bg-background border rounded-md shadow-sm">
             <Table.Root class="w-full">
                 <Table.Header>
